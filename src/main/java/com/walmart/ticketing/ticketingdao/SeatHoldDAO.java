@@ -17,6 +17,13 @@ public interface SeatHoldDAO {
 	 * return all SeatHold objects where expiration time is greater than system time
 	 * @return
 	 */
-	List<SeatHold> getCurrentSeatHolds();	
+	List<SeatHold> getCurrentSeatHolds();
+	
+	/***
+	 * saves the SeatHold objects with Held Seats to the persistence layer
+	 * @param seatHold
+	 * @return
+	 */
+	SeatHold saveSeatHold(SeatHold seatHold);
 	
 }
