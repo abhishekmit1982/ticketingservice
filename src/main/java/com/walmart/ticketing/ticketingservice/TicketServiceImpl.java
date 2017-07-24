@@ -1,10 +1,12 @@
 package com.walmart.ticketing.ticketingservice;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.walmart.ticketing.seats.PositionKey;
 import com.walmart.ticketing.seats.Seat;
 import com.walmart.ticketing.seats.SeatHold;
 import com.walmart.ticketing.ticketingdao.SeatDAO;
@@ -48,37 +50,58 @@ public class TicketServiceImpl implements TicketService {
 					                  SEATS
 	 */
 	public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
-				
-		List<Seat> bestAdjacentSeats = findBestAdjacentSeats(numSeats);			
+		
 		SeatHold seatHold = new SeatHold();
+		Map<PositionKey,Seat> allLinkedSeats = getLinkedSeats();
+		List<Seat> bestAdjacentSeats = findBestAdjacentSeats(allLinkedSeats,numSeats);			
+		
 		seatHold.setHeldSeats(bestAdjacentSeats);
 		return seatHoldDAO.saveSeatHold(seatHold);		
 	}
 	
-	private List<Seat> findBestAdjacentSeats(Integer numSeats)
+	private Map<PositionKey,Seat> getLinkedSeats()
 	{
 		List<Seat> allSeats = seatDAO.getAllSeats();
-		List<Seat> bestAdjacentSeats = new ArrayList<Seat>();
+		Map<PositionKey,Seat> seatMap = allSeats.stream().collect(Collectors.toMap(Seat::getPositionKey,seat -> seat));
 		
-		Seat searchStart = findStartingSeat(allSeats);
+		for(PositionKey positionKey:seatMap.keySet())
+		{
+			Seat currentSeat = seatMap.get(positionKey);
+			Seat nextSeat = seatMap.get(new PositionKey(positionKey.getRowNumber(),positionKey.getSeatNumber() + 1));
+			Seat previousSeat = seatMap.get(new PositionKey(positionKey.getRowNumber(),positionKey.getSeatNumber() + 1));
+			currentSeat.setNextSeat(nextSeat);
+			currentSeat.setPreviousSeat(previousSeat);					
+		}		
+		return seatMap;
+	}
+	
+	private List<Seat> findBestAdjacentSeats(Map<PositionKey,Seat> allLinkedSeats,Integer numSeats)
+	{
+		List<Seat> bestAdjacentSeats = new ArrayList<Seat>();
+						
+		Seat searchStart = findStartingSeat(allLinkedSeats);
 		
 		if(bestAdjacentSeats.size() == 0)
 		{
-			bestAdjacentSeats.addAll(findBestAdjacentSeats(numSeats - 1));
+			bestAdjacentSeats.addAll(findBestAdjacentSeats(allLinkedSeats,numSeats - 1));
 		}
 		return bestAdjacentSeats;
 	}
 
-	private Seat findStartingSeat(List<Seat> allSeats)
+	
+	private Seat findStartingSeat(Map<PositionKey,Seat> allSeats)
 	{
-		String startingRowNumber = allSeats.stream().min((first,second) -> first.getRowNumber().compareTo(second.getRowNumber())).get().getRowNumber();
+		Seat startingSeat = null;
+		/*String startingRowNumber = allSeats.stream().min((first,second) -> first.getRowNumber().compareTo(second.getRowNumber())).get().getRowNumber();
 		List<Seat> startingSeats = allSeats.stream().filter(x -> x.getRowNumber().equalsIgnoreCase(startingRowNumber)).collect(Collectors.toList());
 		Integer startingSeatNumber = 
 				startingSeats.stream().max
 				      ((first,second) -> first.getSeatNumber().compareTo(second.getSeatNumber())).get().getSeatNumber()/2;
 		
 		return allSeats.stream().filter(x -> x.getRowNumber().equalsIgnoreCase(startingRowNumber)
-				                         && x.getSeatNumber() == startingSeatNumber).findAny().get();
+				                         && x.getSeatNumber() == startingSeatNumber).findAny().get();*/
+		
+		return startingSeat;	
 	}
 	public String reserveSeats(int seatHoldId, String customerEmail) {
 		// TODO Auto-generated method stub

@@ -3,17 +3,20 @@ package com.walmart.ticketing.seats;
 public class Seat {
 	
 	/**
-	 * seat	Number represents the number of the seat from left to right
-	 * in a given row while facing the stage.
-	 * values range from 1...n 
+	 * Seat next to the current towards the right i.e A2 --> A3
 	 */
-	private Integer seatNumber;
+	private Seat nextSeat;
 	
 	/**
-	 * rowNumber represents an alphabet value represents the seat of rows
-	 * values range from A...Z with A being the closest to the stage.
+	 * Seat next to the current towards the left i.e A4 --> A3
 	 */
-	private String rowNumber;
+	private Seat previousSeat;
+	
+	/**
+	 * Determines the rowNumber and seatNumber of the current Seat
+	 * i.e C 12
+	 */
+	private PositionKey positionKey;	
 	
 	/**
 	 * field indicating if the seat is reserved
@@ -63,20 +66,27 @@ public class Seat {
 		this.isHeldforReservation = isHeldforReservation;
 	}
 	
-	public Integer getSeatNumber() {
-		return seatNumber;
+	public Seat getNextSeat() {
+		return nextSeat;
 	}
-	
-	public void setSeatNumber(Integer seatNumber) {
-		this.seatNumber = seatNumber;
-	}
-	
-	public String getRowNumber() {
-		return rowNumber;
-	}
-	
-	public void setRowNumber(String rowNumber) {
-		this.rowNumber = rowNumber;
-	}	
 
+	public void setNextSeat(Seat nextSeat) {
+		this.nextSeat = nextSeat;
+	}
+
+	public Seat getPreviousSeat() {
+		return previousSeat;
+	}
+
+	public void setPreviousSeat(Seat previousSeat) {
+		this.previousSeat = previousSeat;
+	}
+
+	public PositionKey getPositionKey() {
+		return positionKey;
+	}
+
+	public void setPositionKey(PositionKey positionKey) {
+		this.positionKey = positionKey;
+	}
 }

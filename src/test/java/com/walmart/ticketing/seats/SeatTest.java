@@ -42,8 +42,10 @@ public class SeatTest extends TestCase {
     public void testSeatAvailabilitywithHoldFlag()
     {
     	//Test by setting Hold flag on seat
-    	currentSeat.setRowNumber("A");
-    	currentSeat.setSeatNumber(12);
+    	PositionKey positionKey = new PositionKey();
+    	positionKey.setRowNumber("A");
+    	positionKey.setSeatNumber(12);
+    	currentSeat.setPositionKey(positionKey);
     	currentSeat.setIsHeldforReservation(Boolean.TRUE);
     	//seat should not be available
     	assertEquals(currentSeat.isSeatAvailable(),Boolean.FALSE);    	
@@ -56,8 +58,10 @@ public class SeatTest extends TestCase {
     public void testSeatAvailabilitywithReservedFlag()
     {
     	//Test by setting reserved flag on seat
-    	currentSeat.setRowNumber("A");
-    	currentSeat.setSeatNumber(12);
+    	PositionKey positionKey = new PositionKey();
+    	positionKey.setRowNumber("A");
+    	positionKey.setSeatNumber(12);
+    	currentSeat.setPositionKey(positionKey);
     	currentSeat.setIsReserved(Boolean.TRUE);
     	//seat should not be available
     	assertEquals(currentSeat.isSeatAvailable(),Boolean.FALSE);    	
@@ -70,8 +74,10 @@ public class SeatTest extends TestCase {
     public void testSeatAvailabilitywithReservedAndHoldFlag()
     {
     	//Test by setting reserved flag on seat
-    	currentSeat.setRowNumber("A");
-    	currentSeat.setSeatNumber(12);
+    	PositionKey positionKey = new PositionKey();
+    	positionKey.setRowNumber("A");
+    	positionKey.setSeatNumber(12);
+    	currentSeat.setPositionKey(positionKey);
     	currentSeat.setIsReserved(Boolean.TRUE);
     	currentSeat.setIsHeldforReservation(Boolean.TRUE);
     	//seat should not be available
