@@ -37,15 +37,15 @@ public class TicketServiceImpl implements TicketService {
 		
 			 			----------[[ STAGE ]]-----------------
 						--------------------------------------
-					A	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-					B	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-		R			C	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-		O			D	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-		W			E	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-					F	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-					G	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-					H	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-					I	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+				1	A	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+				2	B	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+		R		3	C	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+		O		4	D	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+		W		5	E	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+				6	F	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+				7	G	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+				8	H	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+				9	I	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
 					
 					                  SEATS
 	 */
@@ -53,6 +53,9 @@ public class TicketServiceImpl implements TicketService {
 		
 		SeatHold seatHold = new SeatHold();
 		Map<PositionKey,Seat> allLinkedSeats = getLinkedSeats();
+		String startRowNumber = allLinkedSeats.values().stream().map(seat -> seat.getPositionKey().getRowNumber()).distinct().min((x1,x2) -> x1.compareTo(x2)).get();
+		Integer startSeatNumber = allLinkedSeats.values().stream().map(seat -> seat.getPositionKey().getSeatNumber()).max((x1,x2) -> x1.compareTo(x2)).get();
+		Seat startingSeat = findStartingSeat(allLinkedSeats.get(new PositionKey(startRowNumber,startSeatNumber)),allLinkedSeats);
 		List<Seat> bestAdjacentSeats = findBestAdjacentSeats(allLinkedSeats,numSeats);			
 		
 		seatHold.setHeldSeats(bestAdjacentSeats);
@@ -79,8 +82,6 @@ public class TicketServiceImpl implements TicketService {
 	{
 		List<Seat> bestAdjacentSeats = new ArrayList<Seat>();
 						
-		Seat searchStart = findStartingSeat(allLinkedSeats);
-		
 		if(bestAdjacentSeats.size() == 0)
 		{
 			bestAdjacentSeats.addAll(findBestAdjacentSeats(allLinkedSeats,numSeats - 1));
@@ -89,20 +90,21 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	
-	private Seat findStartingSeat(Map<PositionKey,Seat> allSeats)
+	private Seat findStartingSeat(Seat startingSeat,Map<PositionKey,Seat> allSeats)
 	{
-		Seat startingSeat = null;
-		/*String startingRowNumber = allSeats.stream().min((first,second) -> first.getRowNumber().compareTo(second.getRowNumber())).get().getRowNumber();
-		List<Seat> startingSeats = allSeats.stream().filter(x -> x.getRowNumber().equalsIgnoreCase(startingRowNumber)).collect(Collectors.toList());
-		Integer startingSeatNumber = 
-				startingSeats.stream().max
-				      ((first,second) -> first.getSeatNumber().compareTo(second.getSeatNumber())).get().getSeatNumber()/2;
-		
-		return allSeats.stream().filter(x -> x.getRowNumber().equalsIgnoreCase(startingRowNumber)
-				                         && x.getSeatNumber() == startingSeatNumber).findAny().get();*/
-		
-		return startingSeat;	
+		if(startingSeat.isSeatAvailable()) {				
+			return startingSeat;	
+		}
+		else
+		{
+			if(startingSeat.getNextSeat().isSeatAvailable())
+				return findStartingSeat(startingSeat.getNextSeat(),allSeats);
+			else if(startingSeat.getPreviousSeat().isSeatAvailable())
+				return findStartingSeat(startingSeat.getPreviousSeat(),allSeats);			
+		}
+		return null;
 	}
+	
 	public String reserveSeats(int seatHoldId, String customerEmail) {
 		// TODO Auto-generated method stub
 		return null;

@@ -16,7 +16,9 @@ public class Seat {
 	 * Determines the rowNumber and seatNumber of the current Seat
 	 * i.e C 12
 	 */
-	private PositionKey positionKey;	
+	private PositionKey positionKey;
+	
+	private Position position;
 	
 	/**
 	 * field indicating if the seat is reserved
@@ -88,5 +90,13 @@ public class Seat {
 
 	public void setPositionKey(PositionKey positionKey) {
 		this.positionKey = positionKey;
+	}
+	
+	public Position getPosition() {
+		return position;
+	}
+
+	public void setPositionKey(Position position) {
+		this.position = position;
 	}
 }
