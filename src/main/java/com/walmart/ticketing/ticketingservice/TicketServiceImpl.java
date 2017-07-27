@@ -1,11 +1,11 @@
 package com.walmart.ticketing.ticketingservice;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.walmart.ticketing.seats.Position;
 import com.walmart.ticketing.seats.PositionKey;
 import com.walmart.ticketing.seats.Seat;
 import com.walmart.ticketing.seats.SeatHold;
@@ -52,29 +52,28 @@ public class TicketServiceImpl implements TicketService {
 	public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
 		
 		SeatHold seatHold = new SeatHold();
-		Map<PositionKey,Seat> allLinkedSeats = getLinkedSeats();
-		String startRowNumber = allLinkedSeats.values().stream().map(seat -> seat.getPositionKey().getRowNumber()).distinct().min((x1,x2) -> x1.compareTo(x2)).get();
-		Integer startSeatNumber = allLinkedSeats.values().stream().map(seat -> seat.getPositionKey().getSeatNumber()).max((x1,x2) -> x1.compareTo(x2)).get();
-		Seat startingSeat = findStartingSeat(allLinkedSeats.get(new PositionKey(startRowNumber,startSeatNumber)),allLinkedSeats);
-		List<Seat> bestAdjacentSeats = findBestAdjacentSeats(allLinkedSeats,numSeats);			
+		Map<Position,Seat> allLinkedSeats = getLinkedSeats();
 		
-		seatHold.setHeldSeats(bestAdjacentSeats);
+		//Seat startingSeat = findStartingSeat(allLinkedSeats.get(new PositionKey(startRowNumber,startSeatNumber)),allLinkedSeats);
+		//List<Seat> bestAdjacentSeats = findBestAdjacentSeats(allLinkedSeats,numSeats);			
+		
+		//seatHold.setHeldSeats(bestAdjacentSeats);
 		return seatHoldDAO.saveSeatHold(seatHold);		
 	}
 	
-	private Map<PositionKey,Seat> getLinkedSeats()
+	private Map<Position,Seat> getLinkedSeats()
 	{
 		List<Seat> allSeats = seatDAO.getAllSeats();
-		Map<PositionKey,Seat> seatMap = allSeats.stream().collect(Collectors.toMap(Seat::getPositionKey,seat -> seat));
+		Map<Position,Seat> seatMap = allSeats.stream().collect(Collectors.toMap(Seat::getPosition,seat -> seat));
 		
-		for(PositionKey positionKey:seatMap.keySet())
+		/*for(PositionKey positionKey:seatMap.keySet())
 		{
 			Seat currentSeat = seatMap.get(positionKey);
 			Seat nextSeat = seatMap.get(new PositionKey(positionKey.getRowNumber(),positionKey.getSeatNumber() + 1));
 			Seat previousSeat = seatMap.get(new PositionKey(positionKey.getRowNumber(),positionKey.getSeatNumber() + 1));
 			currentSeat.setNextSeat(nextSeat);
 			currentSeat.setPreviousSeat(previousSeat);					
-		}		
+		}*/		
 		return seatMap;
 	}
 	

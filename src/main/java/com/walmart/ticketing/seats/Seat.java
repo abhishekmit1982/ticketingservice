@@ -39,10 +39,13 @@ public class Seat {
 	 * @return
 	 */
 	
-	public Seat()
+	public Seat () {}
+	
+	public Seat(Position position)
 	{
-		
+		this.position = position;
 	}
+	
 	
 	public Boolean isSeatAvailable(){
 		
@@ -88,8 +91,8 @@ public class Seat {
 		return positionKey;
 	}
 
-	public void setPositionKey(PositionKey positionKey) {
-		this.positionKey = positionKey;
+	public void setPosition(Position position) {
+		this.position = position;
 	}
 	
 	public Position getPosition() {
