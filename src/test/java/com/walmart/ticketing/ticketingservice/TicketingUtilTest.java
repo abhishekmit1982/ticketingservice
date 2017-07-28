@@ -120,6 +120,12 @@ public class TicketingUtilTest extends TestCase {
     
     public void testgetAdjacentSeats()
     {
+    	/**  	1	2	3	4	5	6	7	8
+    	 *   1	X	O	X	O	X	O	X	X
+    	 *   2  X	X	O	X	X	X	X	X
+    	 *   Trying to find 3 best seats
+    	 *   first match is row 2, seat 1 - seat 3.
+    	 */
     	Map<Position, Seat> allSeatsMap = ImmutableMap.<Position, Seat>builder()
     		    .put(new Position(1,1), new Seat(new Position(1,1)))
     		    .put(new Position(1,2), new Seat(new Position(1,2)))
@@ -145,11 +151,61 @@ public class TicketingUtilTest extends TestCase {
     	filledSeat.setIsReserved(Boolean.TRUE);
     	filledSeat = allSeatsMap.get(new Position(1,6));
     	filledSeat.setIsReserved(Boolean.TRUE);
-    	Optional<List<Seat>> adjacentSeats = TicketingUtils.getAdjacentSeats(allSeatsMap, 3);
+    	filledSeat = allSeatsMap.get(new Position(2,3));    	
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	
+    	Optional<List<Seat>> adjacentSeats = TicketingUtils.getAdjacentSeats(allSeatsMap, 5);
     	assertTrue(adjacentSeats.isPresent());
-    	assertTrue(adjacentSeats.get().size() == 3);
+    	assertTrue(adjacentSeats.get().size() == 5);
     	assertTrue(adjacentSeats.get().stream().map(x1 -> x1.getPosition().getRowNumber()).max((x1,x2) -> x1.compareTo(x2)).get() == 2);
-    	assertTrue(adjacentSeats.get().stream().map(x1 -> x1.getPosition().getSeatNumber()).min((x1,x2) -> x1.compareTo(x2)).get() == 1);
-    	assertTrue(adjacentSeats.get().stream().map(x1 -> x1.getPosition().getSeatNumber()).max((x1,x2) -> x1.compareTo(x2)).get() == 3);
+    	assertTrue(adjacentSeats.get().stream().map(x1 -> x1.getPosition().getSeatNumber()).min((x1,x2) -> x1.compareTo(x2)).get() == 4);
+    	assertTrue(adjacentSeats.get().stream().map(x1 -> x1.getPosition().getSeatNumber()).max((x1,x2) -> x1.compareTo(x2)).get() == 8);
+    }
+    
+    public void testBestStartingPosition()
+    {
+    	/**  	1	2	3	4	5	6	7	8
+    	 *   1	X	O	X	O	X	O	X	X
+    	 *   2  X	X	X	X	X	X	X	X
+    	 *   Trying to find 5 best seats
+    	 *   best starting position wil be 12.
+    	 */
+    	Map<Position, Seat> allSeatsMap = ImmutableMap.<Position, Seat>builder()
+    		    .put(new Position(1,1), new Seat(new Position(1,1)))
+    		    .put(new Position(1,2), new Seat(new Position(1,2)))
+    		    .put(new Position(1,3), new Seat(new Position(1,3)))
+    		    .put(new Position(1,4), new Seat(new Position(1,4)))
+    		    .put(new Position(1,5), new Seat(new Position(1,5)))
+    		    .put(new Position(1,6), new Seat(new Position(1,6)))
+    		    .put(new Position(1,7), new Seat(new Position(1,7)))
+    		    .put(new Position(1,8), new Seat(new Position(1,8)))
+    		    .put(new Position(1,9), new Seat(new Position(1,9)))
+    		    .put(new Position(2,1), new Seat(new Position(2,1)))
+    		    .put(new Position(2,2), new Seat(new Position(2,2)))
+    		    .put(new Position(2,3), new Seat(new Position(2,3)))
+    		    .put(new Position(2,4), new Seat(new Position(2,4)))
+    		    .put(new Position(2,5), new Seat(new Position(2,5)))
+    		    .put(new Position(2,6), new Seat(new Position(2,6)))
+    		    .put(new Position(2,7), new Seat(new Position(2,7)))
+    		    .put(new Position(2,8), new Seat(new Position(2,8)))
+    		    .put(new Position(2,9), new Seat(new Position(2,9)))
+    		    .build();
+    	
+    	Seat filledSeat = allSeatsMap.get(new Position(1,2));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,4));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,6));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,2));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,3));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,6));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	
+    	Optional<Integer> bestStartingPosition = TicketingUtils.findBestStartingPositon(allSeatsMap, 9, 5);
+    	System.out.println(bestStartingPosition);
+    	assertTrue(bestStartingPosition == null);
     }
 }
