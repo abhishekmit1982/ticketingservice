@@ -3,6 +3,7 @@ package com.walmart.ticketing.ticketingservice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.walmart.ticketing.seats.Position;
@@ -52,12 +53,12 @@ public class TicketServiceImpl implements TicketService {
 	public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
 		
 		SeatHold seatHold = new SeatHold();
-		Map<Position,Seat> allLinkedSeats = getLinkedSeats();
+				
 		
 		//Seat startingSeat = findStartingSeat(allLinkedSeats.get(new PositionKey(startRowNumber,startSeatNumber)),allLinkedSeats);
-		//List<Seat> bestAdjacentSeats = findBestAdjacentSeats(allLinkedSeats,numSeats);			
+		Optional<List<Seat>> bestAdjacentSeats = TicketingUtils.getAdjacentSeats(getLinkedSeats(), numSeats);			
 		
-		//seatHold.setHeldSeats(bestAdjacentSeats);
+		seatHold.setHeldSeats(bestAdjacentSeats.get());
 		return seatHoldDAO.saveSeatHold(seatHold);		
 	}
 	
@@ -77,7 +78,7 @@ public class TicketServiceImpl implements TicketService {
 		return seatMap;
 	}
 	
-	private List<Seat> findBestAdjacentSeats(Map<PositionKey,Seat> allLinkedSeats,Integer numSeats)
+	/*private List<Seat> findBestAdjacentSeats(Map<PositionKey,Seat> allLinkedSeats,Integer numSeats)
 	{
 		List<Seat> bestAdjacentSeats = new ArrayList<Seat>();
 						
@@ -102,7 +103,7 @@ public class TicketServiceImpl implements TicketService {
 				return findStartingSeat(startingSeat.getPreviousSeat(),allSeats);			
 		}
 		return null;
-	}
+	}*/
 	
 	public String reserveSeats(int seatHoldId, String customerEmail) {
 		// TODO Auto-generated method stub
