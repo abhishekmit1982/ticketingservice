@@ -16,8 +16,9 @@ int numSeatsAvailable();
 * @param customerEmail unique identifier for the customer
 * @return a SeatHold object identifying the specific seats and related
 information
+ * @throws Exception 
 */
-SeatHold findAndHoldSeats(int numSeats, String customerEmail);
+SeatHold findAndHoldSeats(int numSeats, String customerEmail) throws Exception;
 /**
 * Commit seats held for a specific customer
 *

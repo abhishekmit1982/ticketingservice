@@ -206,7 +206,7 @@ public class TicketingUtilTest extends TestCase {
     	
     	Optional<Integer> bestStartingPosition = TicketingUtils.findBestStartingPositon(allSeatsMap, 9, 5);
     	System.out.println(bestStartingPosition);
-    	assertTrue(bestStartingPosition == null);
+    	assertTrue(bestStartingPosition.isPresent() == false);
     }
     
     public void testFindBestSeatsAllSeatsAvailable()
@@ -295,6 +295,129 @@ public class TicketingUtilTest extends TestCase {
     	System.out.println(bestSeats.size());
     	System.out.println(bestSeats);
     	assertTrue(bestSeats != null);
+    	assertTrue(bestSeats.size() == 5);    	
     	
+    }
+    
+    public void testfindNoAdjacentSeats()
+    {
+    	/**  	1	2	3	4	5	6	7	8   9
+    	 *   1	X	O	X	O	X	O	O	O   X
+    	 *   2  O	X	O	O	X	O	X	0   X
+    	 *   Trying to find 4 best seats
+    	 *   best seats will be 1,5, 2,5, 1,3 and 2,7
+    	 */
+    	Map<Position, Seat> allSeatsMap = ImmutableMap.<Position, Seat>builder()
+    		    .put(new Position(1,1), new Seat(new Position(1,1)))
+    		    .put(new Position(1,2), new Seat(new Position(1,2)))
+    		    .put(new Position(1,3), new Seat(new Position(1,3)))
+    		    .put(new Position(1,4), new Seat(new Position(1,4)))
+    		    .put(new Position(1,5), new Seat(new Position(1,5)))
+    		    .put(new Position(1,6), new Seat(new Position(1,6)))
+    		    .put(new Position(1,7), new Seat(new Position(1,7)))
+    		    .put(new Position(1,8), new Seat(new Position(1,8)))
+    		    .put(new Position(1,9), new Seat(new Position(1,9)))
+    		    .put(new Position(2,1), new Seat(new Position(2,1)))
+    		    .put(new Position(2,2), new Seat(new Position(2,2)))
+    		    .put(new Position(2,3), new Seat(new Position(2,3)))
+    		    .put(new Position(2,4), new Seat(new Position(2,4)))
+    		    .put(new Position(2,5), new Seat(new Position(2,5)))
+    		    .put(new Position(2,6), new Seat(new Position(2,6)))
+    		    .put(new Position(2,7), new Seat(new Position(2,7)))
+    		    .put(new Position(2,8), new Seat(new Position(2,8)))
+    		    .put(new Position(2,9), new Seat(new Position(2,9)))
+    		    .build();
+    	
+    	Seat filledSeat = allSeatsMap.get(new Position(1,2));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,4));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,6));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,7));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,8));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,1));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,3));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,4));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,6));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,8));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	
+    	List<Seat> bestSeats = TicketingUtils.findBestSeats(allSeatsMap, 4, 4);
+    	System.out.println(bestSeats.size());
+    	System.out.println(bestSeats);
+    	assertTrue(bestSeats != null);
+    	assertTrue(bestSeats.size() == 4); 
+    }
+    
+    public void testSeatsNotAvailable()
+    {
+    	/**  	1	2	3	4	5	6	7	8   9
+    	 *   1	X	O	X	O	X	O	O	O   O
+    	 *   2  O	O	O	O	O	O	X	0   O
+    	 *   Trying to find 5 best seats
+    	 *   Only 4 are available, return only 4 seats
+    	 */
+    	Map<Position, Seat> allSeatsMap = ImmutableMap.<Position, Seat>builder()
+    		    .put(new Position(1,1), new Seat(new Position(1,1)))
+    		    .put(new Position(1,2), new Seat(new Position(1,2)))
+    		    .put(new Position(1,3), new Seat(new Position(1,3)))
+    		    .put(new Position(1,4), new Seat(new Position(1,4)))
+    		    .put(new Position(1,5), new Seat(new Position(1,5)))
+    		    .put(new Position(1,6), new Seat(new Position(1,6)))
+    		    .put(new Position(1,7), new Seat(new Position(1,7)))
+    		    .put(new Position(1,8), new Seat(new Position(1,8)))
+    		    .put(new Position(1,9), new Seat(new Position(1,9)))
+    		    .put(new Position(2,1), new Seat(new Position(2,1)))
+    		    .put(new Position(2,2), new Seat(new Position(2,2)))
+    		    .put(new Position(2,3), new Seat(new Position(2,3)))
+    		    .put(new Position(2,4), new Seat(new Position(2,4)))
+    		    .put(new Position(2,5), new Seat(new Position(2,5)))
+    		    .put(new Position(2,6), new Seat(new Position(2,6)))
+    		    .put(new Position(2,7), new Seat(new Position(2,7)))
+    		    .put(new Position(2,8), new Seat(new Position(2,8)))
+    		    .put(new Position(2,9), new Seat(new Position(2,9)))
+    		    .build();
+    	
+    	Seat filledSeat = allSeatsMap.get(new Position(1,2));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,4));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,6));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,7));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,8));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(1,9));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,1));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,2));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,3));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,4));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,5));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,6));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,8));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	filledSeat = allSeatsMap.get(new Position(2,9));
+    	filledSeat.setIsReserved(Boolean.TRUE);
+    	
+    	List<Seat> bestSeats = TicketingUtils.findBestSeats(allSeatsMap, 5, 5);
+    	System.out.println(bestSeats.size());
+    	System.out.println(bestSeats);
+    	assertTrue(bestSeats != null);
+    	assertTrue(bestSeats.size() == 4);
     }
 }

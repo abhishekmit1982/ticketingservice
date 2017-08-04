@@ -56,12 +56,18 @@ public class TicketServiceImpl implements TicketService {
 				9	I	1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
 					
 					                  SEATS
+	 * @throws Exception 
 	 */
-	public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
+	public SeatHold findAndHoldSeats(int numSeats, String customerEmail) throws Exception {
 		
 		SeatHold seatHold = new SeatHold();		
-		Optional<List<Seat>> bestAdjacentSeats = TicketingUtils.getAdjacentSeats(getLinkedSeats(), numSeats);		
-		seatHold.setHeldSeats(bestAdjacentSeats.get());
+		List<Seat> bestAdjacentSeats = TicketingUtils.findBestSeats(getLinkedSeats(), numSeats, numSeats);
+		if(bestAdjacentSeats.size() < numSeats)
+		{
+			String message = String.format("Only %d seats are available, Please requests upto the available number of seats",bestAdjacentSeats.size());
+			throw new Exception(message);
+		}
+		seatHold.setHeldSeats(bestAdjacentSeats);
 		seatHold.setExpirationDate(DateUtils.addMinutes(new Date(), TicketingUtils.SEAT_HOLD_EXPIRATION_INTERVAL_MINS));
 		for(Seat seat:seatHold.getHeldSeats())
 		{

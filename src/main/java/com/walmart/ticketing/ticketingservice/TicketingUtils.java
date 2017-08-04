@@ -84,14 +84,18 @@ public class TicketingUtils {
 	public static List<Seat> findBestSeats(Map<Position, Seat> allSeatsMap,Integer numSeats,Integer remainingSeats)	
 	{
 		List<Seat> foundSeats = new ArrayList<>();
-		Optional<List<Seat>> interimSeats = null;
+		Optional<List<Seat>> interimSeats = Optional.ofNullable(null);
 		if(remainingSeats > 0)
 			interimSeats = getAdjacentSeats(allSeatsMap,remainingSeats);
+		else
+			return foundSeats;
 		if(!interimSeats.isPresent())
 		{
-			foundSeats.addAll(findBestSeats(allSeatsMap,numSeats,remainingSeats - 1));
-			if(foundSeats.size() < numSeats)
-				foundSeats.addAll(findBestSeats(allSeatsMap,numSeats,numSeats-(remainingSeats - 1)));
+			foundSeats.addAll(findBestSeats(allSeatsMap,numSeats - 1,remainingSeats - 1));
+			if(foundSeats.size() < numSeats){
+				
+				foundSeats.addAll(findBestSeats(allSeatsMap,numSeats - 1,numSeats-(remainingSeats - 1)));
+			}				
 		}
 		else
 		{
