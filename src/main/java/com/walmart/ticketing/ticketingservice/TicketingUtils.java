@@ -78,13 +78,43 @@ public class TicketingUtils {
 			}
 		}
 		
-		return Optional.of(adjacentSeats);
+		return Optional.ofNullable(adjacentSeats);
+	}
+	
+	public static List<Seat> findBestSeats(Map<Position, Seat> allSeatsMap,Integer numSeats,Integer remainingSeats)	
+	{
+		List<Seat> foundSeats = new ArrayList<>();
+		Optional<List<Seat>> interimSeats = null;
+		if(remainingSeats > 0)
+			interimSeats = getAdjacentSeats(allSeatsMap,remainingSeats);
+		if(!interimSeats.isPresent())
+		{
+			foundSeats.addAll(findBestSeats(allSeatsMap,numSeats,remainingSeats - 1));
+			if(foundSeats.size() < numSeats)
+				foundSeats.addAll(findBestSeats(allSeatsMap,numSeats,numSeats-(remainingSeats - 1)));
+		}
+		else
+		{
+			foundSeats.addAll(interimSeats.get());
+			makeSelectedSeatsUnAvailable(allSeatsMap,interimSeats.get());
+		}
+		return foundSeats;
+	}
+	
+	public static void makeSelectedSeatsUnAvailable(Map<Position, Seat> allSeatsMap,List<Seat> selectedSeats)
+	{
+		for(Seat selectedSeat:selectedSeats)
+		{
+			Seat changedSeat = allSeatsMap.get(selectedSeat.getPosition());
+			changedSeat.setIsHeldforReservation(Boolean.TRUE);
+		}
 	}
 	
 	public static Optional<Integer> findBestStartingPositon(Map<Position, Seat> allSeatsMap,Integer maxSeatNumber,Integer numSeats)
 	{
 		String seatMap = getSeatGraph(allSeatsMap);
 		StringBuilder seatSearch = new StringBuilder("");
+		Integer startingPosition = null;
 		for(Integer curr=0;curr<numSeats;curr++)
 		{
 			seatSearch.append(FREE_INDICATOR);			
@@ -102,9 +132,9 @@ public class TicketingUtils {
 		if(distancetoMiddleMap.size() > 0)
 		{
 			Entry<Integer,Integer> min = Collections.min(distancetoMiddleMap.entrySet(),Comparator.comparingInt(Entry::getValue));
-			return Optional.of(min.getKey());
+			startingPosition = min.getKey();
 		}
-		return null;
+		return Optional.ofNullable(startingPosition);
 		
 	}
 	/**
