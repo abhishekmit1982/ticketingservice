@@ -14,6 +14,14 @@ import com.walmart.ticketing.seats.SeatHold;
 import com.walmart.ticketing.ticketingdao.SeatDAO;
 import com.walmart.ticketing.ticketingdao.SeatHoldDAO;
 
+/**
+ * @author ABJ577
+ *
+ */
+/**
+ * @author ABJ577
+ *
+ */
 public class TicketServiceImpl implements TicketService {
 
 	private SeatHoldDAO seatHoldDAO;
@@ -77,6 +85,12 @@ public class TicketServiceImpl implements TicketService {
 		
 	}
 	
+	
+	
+	/**This function returns a map of all seats available in the theatre
+	 * with the key being the position of the Seat and value being the seat.
+	 * @return
+	 */
 	private Map<Position,Seat> getLinkedSeats()
 	{
 		List<Seat> allSeats = seatDAO.getAllSeats();
@@ -84,6 +98,11 @@ public class TicketServiceImpl implements TicketService {
 						
 	}
 	
+	
+	/* This method reserves the seats being held by a customer.
+	 * The hold on the seats if expired will cause an Exception.
+	 * @see com.walmart.ticketing.ticketingservice.TicketService#reserveSeats(int, java.lang.String)
+	 */
 	public String reserveSeats(int seatHoldId, String customerEmail) throws Exception {
 		SeatHold currSeatHold = seatHoldDAO.getSeatHoldbyId(seatHoldId);
 		if(currSeatHold.getExpirationDate().compareTo(new Date()) < 0){
