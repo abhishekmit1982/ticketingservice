@@ -2,18 +2,19 @@
 
 The implementation is based on assuming the theatre seating to be as shown as below
 
+<pre>
 <-----------------------Seat Number--------------->
    	  1   2   3   4   5   6   7   8   9   10
-* |    1  X   X   X   X   X   X   X   X   X   X 
+  |    1  X   X   X   X   X   X   X   X   X   X 
  
-* R|   2  X   X   X   O   X   X   X   X   X   X 
+  R|   2  X   X   X   O   X   X   X   X   X   X 
 
-* O|   3  X   X   X   X   X   X   X   X   X   X 
+  O|   3  X   X   X   X   X   X   X   X   X   X 
 
-* W|   4  X   X   X   X   X   X   X   X   X   X 
+  W|   4  X   X   X   X   X   X   X   X   X   X 
 
-*  |   5  X   X   O   X   X   X   X   X   X   X 
-
+   |   5  X   X   O   X   X   X   X   X   X   X 
+</pre>
 The seat assignment logic uses regular expression where X denotes a available seat
 and O signifies an occupied seat.
 So to find 5 available seats, a pattern matching logic of 'XXXXX' is used.
