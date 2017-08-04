@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +22,10 @@ import com.walmart.ticketing.seats.Seat;
  */
 
 public class TicketingUtils {
+	
+	private TicketingUtils (){}
 
+	public static Integer SEAT_HOLD_EXPIRATION_INTERVAL_MINS  = 5;
 	/*
 	 * This method return a string representation of the map of seats
 	 * X signifies that seat is vacant, O signifies that seat is held
@@ -46,7 +50,7 @@ public class TicketingUtils {
 			for (Integer currentRowNumber = 1; currentRowNumber <= maxRowNumber; currentRowNumber++) {
 				for (Integer currentSeatNumber = 1; currentSeatNumber <= maxSeatNumber; currentSeatNumber++) {
 					Seat currentSeat = allSeatsMap.get(new Position(currentRowNumber, currentSeatNumber));
-					if (currentSeat.isSeatAvailable())
+					if(currentSeat.isSeatAvailable())
 						seatGraph.append(FREE_INDICATOR);
 					else
 						seatGraph.append(OCCUPIED_INDICATOR);
@@ -60,8 +64,6 @@ public class TicketingUtils {
 	
 	public static Optional<List<Seat>> getAdjacentSeats(Map<Position, Seat> allSeatsMap,Integer numSeats)
 	{
-		Integer maxRowNumber = allSeatsMap.values().stream().map(seat -> seat.getPosition().getRowNumber())
-				.distinct().max((x1, x2) -> x1.compareTo(x2)).get();
 		Integer maxSeatNumber = allSeatsMap.values().stream().map(seat -> seat.getPosition().getSeatNumber())
 				.max((x1, x2) -> x1.compareTo(x2)).get();
 		List<Seat> adjacentSeats = null;
@@ -118,5 +120,10 @@ public class TicketingUtils {
 		Integer rowNumber = flatPosition/(seatSize + 1) + 1;
 		Integer seatNumber = (flatPosition + 1) % (seatSize + 1);
 		return new Position(rowNumber, seatNumber);
+	}
+	
+	public static String getReservationCode()
+	{
+		return UUID.randomUUID().toString();
 	}
 }

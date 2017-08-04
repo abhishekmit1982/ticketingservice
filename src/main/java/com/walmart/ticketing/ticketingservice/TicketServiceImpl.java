@@ -1,13 +1,14 @@
 package com.walmart.ticketing.ticketingservice;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import com.walmart.ticketing.seats.Position;
-import com.walmart.ticketing.seats.PositionKey;
 import com.walmart.ticketing.seats.Seat;
 import com.walmart.ticketing.seats.SeatHold;
 import com.walmart.ticketing.ticketingdao.SeatDAO;
@@ -23,9 +24,15 @@ public class TicketServiceImpl implements TicketService {
 		this.seatDAO = seatDAO;
 		this.seatHoldDAO = seatHoldDAO;
 	}
+	
+	/*
+	 * Returns seats from seatDAO that are not marked as reserved or held for reservation.
+	 * @see com.walmart.ticketing.ticketingservice.TicketService#numSeatsAvailable()
+	 */
 	public int numSeatsAvailable() {		
-		return seatDAO.getAvailableSeats().size();
-		
+		List<Seat> allSeats = seatDAO.getAllSeats();
+		List<Seat> availableSeats = allSeats.stream().filter(seat -> seat.isSeatAvailable().equals(Boolean.TRUE)).collect(Collectors.toList());
+		return availableSeats.size();		
 	}
 	
 	/**
@@ -52,62 +59,41 @@ public class TicketServiceImpl implements TicketService {
 	 */
 	public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
 		
-		SeatHold seatHold = new SeatHold();
-				
-		
-		//Seat startingSeat = findStartingSeat(allLinkedSeats.get(new PositionKey(startRowNumber,startSeatNumber)),allLinkedSeats);
-		Optional<List<Seat>> bestAdjacentSeats = TicketingUtils.getAdjacentSeats(getLinkedSeats(), numSeats);			
-		
+		SeatHold seatHold = new SeatHold();		
+		Optional<List<Seat>> bestAdjacentSeats = TicketingUtils.getAdjacentSeats(getLinkedSeats(), numSeats);		
 		seatHold.setHeldSeats(bestAdjacentSeats.get());
+		seatHold.setExpirationDate(DateUtils.addMinutes(new Date(), TicketingUtils.SEAT_HOLD_EXPIRATION_INTERVAL_MINS));
+		for(Seat seat:seatHold.getHeldSeats())
+		{
+			seat.setIsHeldforReservation(Boolean.TRUE);			
+		}
 		return seatHoldDAO.saveSeatHold(seatHold);		
+		
 	}
 	
 	private Map<Position,Seat> getLinkedSeats()
 	{
 		List<Seat> allSeats = seatDAO.getAllSeats();
-		Map<Position,Seat> seatMap = allSeats.stream().collect(Collectors.toMap(Seat::getPosition,seat -> seat));
-		
-		/*for(PositionKey positionKey:seatMap.keySet())
-		{
-			Seat currentSeat = seatMap.get(positionKey);
-			Seat nextSeat = seatMap.get(new PositionKey(positionKey.getRowNumber(),positionKey.getSeatNumber() + 1));
-			Seat previousSeat = seatMap.get(new PositionKey(positionKey.getRowNumber(),positionKey.getSeatNumber() + 1));
-			currentSeat.setNextSeat(nextSeat);
-			currentSeat.setPreviousSeat(previousSeat);					
-		}*/		
-		return seatMap;
-	}
-	
-	/*private List<Seat> findBestAdjacentSeats(Map<PositionKey,Seat> allLinkedSeats,Integer numSeats)
-	{
-		List<Seat> bestAdjacentSeats = new ArrayList<Seat>();
+		return allSeats.stream().collect(Collectors.toMap(Seat::getPosition,seat -> seat));
 						
-		if(bestAdjacentSeats.size() == 0)
-		{
-			bestAdjacentSeats.addAll(findBestAdjacentSeats(allLinkedSeats,numSeats - 1));
-		}
-		return bestAdjacentSeats;
 	}
-
 	
-	private Seat findStartingSeat(Seat startingSeat,Map<PositionKey,Seat> allSeats)
-	{
-		if(startingSeat.isSeatAvailable()) {				
-			return startingSeat;	
-		}
+	public String reserveSeats(int seatHoldId, String customerEmail) throws Exception {
+		SeatHold currSeatHold = seatHoldDAO.getSeatHoldbyId(seatHoldId);
+		if(currSeatHold.getExpirationDate().compareTo(new Date()) < 0){
+			throw new Exception("Hold for the seats has expired. Please request seats again");			
+			}
 		else
 		{
-			if(startingSeat.getNextSeat().isSeatAvailable())
-				return findStartingSeat(startingSeat.getNextSeat(),allSeats);
-			else if(startingSeat.getPreviousSeat().isSeatAvailable())
-				return findStartingSeat(startingSeat.getPreviousSeat(),allSeats);			
+			for(Seat seat:currSeatHold.getHeldSeats())
+			{
+				seat.setIsHeldforReservation(Boolean.FALSE);
+				seat.setIsReserved(Boolean.TRUE);
+			}
+			currSeatHold.setReservationCode(TicketingUtils.getReservationCode());
+			seatHoldDAO.saveSeatHold(currSeatHold);
+			return currSeatHold.getReservationCode();
 		}
-		return null;
-	}*/
-	
-	public String reserveSeats(int seatHoldId, String customerEmail) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 

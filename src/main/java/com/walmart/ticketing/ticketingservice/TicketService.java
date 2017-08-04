@@ -25,6 +25,7 @@ SeatHold findAndHoldSeats(int numSeats, String customerEmail);
 * @param customerEmail the email address of the customer to which the
 seat hold is assigned
 * @return a reservation confirmation code
+ * @throws Exception 
 */
-String reserveSeats(int seatHoldId, String customerEmail);
+String reserveSeats(int seatHoldId, String customerEmail) throws Exception;
 }

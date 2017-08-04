@@ -11,7 +11,9 @@ public class SeatHold {
 	private List<Seat> heldSeats = new ArrayList<Seat>();
 	
 	private Date expirationDate = new Date(System.currentTimeMillis());
-
+	
+	private String reservationCode;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -34,6 +36,14 @@ public class SeatHold {
 
 	public void setExpirationDate(Date expirationDate) {
 		this.expirationDate = expirationDate;
+	}
+
+	public String getReservationCode() {
+		return reservationCode;
+	}
+
+	public void setReservationCode(String reservationCode) {
+		this.reservationCode = reservationCode;
 	}	
 
 }
